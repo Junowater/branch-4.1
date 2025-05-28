@@ -141,7 +141,6 @@
 </script>
 
 <!-- Team Member Modal -->
-<div id="teamMemberModal" class="modal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
   <h2 id="modalTitle">Edit Assignments for </h2>
   <div id="quarterToggles"></div>
   <button id="saveRefreshBtn">Save & Refresh</button>
@@ -149,14 +148,12 @@
   <button onclick="closeModal()">Close</button>
 </div>
 <script>
-  const modal = document.getElementById("teamMemberModal");
   const modalTitle = document.getElementById("modalTitle");
   const openProfileBtn = document.getElementById("openProfileBtn");
   const saveRefreshBtn = document.getElementById("saveRefreshBtn");
   const quarterToggles = document.getElementById("quarterToggles");
   let currentMember = "";
 
-  function openModal(name) {
     currentMember = name;
     modalTitle.textContent = "Edit Assignments for " + name;
     modal.style.display = "block";
@@ -179,6 +176,70 @@
         localStorage.setItem("teamMemberData", JSON.stringify(memberData));
       };
       const label = document.createElement("label");
+      label.textContent = q + ": ";
+      label.appendChild(select);
+      quarterToggles.appendChild(label);
+      quarterToggles.appendChild(document.createElement("br"));
+    });
+
+    saveRefreshBtn.onclick = function() {
+      modal.style.display = "none";
+      location.reload();
+    };
+
+    openProfileBtn.onclick = function() {
+      window.location.href = "profile.html?name=" + encodeURIComponent(name);
+    };
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+  }
+</script>
+
+<!-- Team Member Modal -->
+<div id="teamMemberModal" class="modal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
+  <h2 id="modalTitle">Edit Assignments for </h2>
+  <div id="quarterToggles"></div>
+  <button id="saveRefreshBtn">Save & Refresh</button>
+  <button id="openProfileBtn">View Full Profile</button>
+  <button onclick="closeModal()">Close</button>
+</div>
+<script>
+  var modal = document.getElementById("teamMemberModal");
+  var modalTitle = document.getElementById("modalTitle");
+  var openProfileBtn = document.getElementById("openProfileBtn");
+  var saveRefreshBtn = document.getElementById("saveRefreshBtn");
+  var quarterToggles = document.getElementById("quarterToggles");
+  var currentMember = "";
+
+  function openModal(name) {
+    currentMember = name;
+    modalTitle.textContent = "Edit Assignments for " + name;
+    modal.style.display = "block";
+
+    var lines = ["Front", "Center", "Rear", "None"];
+    var quarters = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
+    var memberData = JSON.parse(localStorage.getItem("teamMemberData") || "{}");
+    var entry = memberData[name] || { quarters: {} };
+
+    quarterToggles.innerHTML = "";
+    quarters.forEach(function(q) {
+      var line = entry.quarters && entry.quarters[q] ? entry.quarters[q] : "None";
+      var select = document.createElement("select");
+      lines.forEach(function(l) {
+        var option = document.createElement("option");
+        option.value = l;
+        option.textContent = l;
+        if (l === line) option.selected = true;
+        select.appendChild(option);
+      });
+      select.onchange = function(e) {
+        entry.quarters[q] = e.target.value;
+        memberData[name] = entry;
+        localStorage.setItem("teamMemberData", JSON.stringify(memberData));
+      };
+      var label = document.createElement("label");
       label.textContent = q + ": ";
       label.appendChild(select);
       quarterToggles.appendChild(label);
